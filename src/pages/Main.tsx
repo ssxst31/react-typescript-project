@@ -1,22 +1,81 @@
 import { useState, useEffect } from 'react';
 import { Reset } from 'styled-reset';
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortDown } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components';
 import Item from './item';
 
 const Main = () => {
-  const [count, setCount] = useState<any>([]);
+  const [dataList, setDataList] = useState<any>([]);
   const [plus, setPlus] = useState<any>([false, false]);
+  const [processing, setProcessing] = useState<any>([]);
+  const [material, setMaterial] = useState<any>([]);
+  const processingLength = processing.length;
+  const materialLength = material.length;
+
   useEffect(() => {
-    fetch('/data/requests.json', {
-      method: 'GET',
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setCount(data.requests);
-      });
-  }, []);
+    if (filterMenu(processing, material).length === 0) {
+      fetch('/data/requests.json', {
+        method: 'GET',
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setDataList(data.requests);
+        });
+    } else {
+      setDataList(filterMenu(processing, material));
+    }
+  }, [processing, material]);
+
+  const menuToggle = (e: number) => {
+    if (e === 1) {
+      setPlus([!plus[0], false]);
+    }
+    if (e === 2) {
+      setPlus([false, !plus[1]]);
+    }
+  };
+
+  const filterMenu = (processing: any, material: any) => {
+    const filteredMonsters = dataList.filter(
+      (item: any) =>
+        (item.method.includes('선반') && processing.indexOf('선반') > -1) ||
+        (item.method.includes('밀링') && processing.indexOf('밀링') > -1),
+    );
+
+    if (materialLength) {
+      const newFilteredMonsters = dataList.filter(
+        (item: any) =>
+          (material.indexOf('알루미늄') > -1 &&
+            item?.material.includes('알루미늄')) ||
+          (material.indexOf('탄소강') > -1 &&
+            item?.material.includes('탄소강')) ||
+          (material.indexOf('강철') > -1 && item?.material.includes('강철')) ||
+          (material.indexOf('구리') > -1 && item?.material.includes('구리')) ||
+          (material.indexOf('스테인리스강') > -1 &&
+            item?.material.includes('스테인리스강')),
+      );
+      return newFilteredMonsters;
+    }
+    return filteredMonsters;
+  };
+
+  const changeHandler = (checked: any, item: any) => {
+    if (checked) {
+      setProcessing([...processing, item]);
+    } else {
+      setProcessing(processing.filter((el: any) => el !== item));
+    }
+  };
+
+  const changeMaterial = (checked: any, item: any) => {
+    if (checked) {
+      setMaterial([...material, item]);
+    } else {
+      setMaterial(material.filter((el: any) => el !== item));
+    }
+  };
+
   return (
     <>
       <Reset />
@@ -26,20 +85,36 @@ const Main = () => {
           <Content>파트너님에게 딱 알맞는 요청서를 찾아보세요.</Content>
         </TextBox>
         <SelectBox>
-          <ProcessingSelect>
-            <BoxText>가공방식</BoxText>
+          <ProcessingSelect
+            onClick={() => {
+              menuToggle(1);
+            }}
+          >
+            <BoxText>가공방식 ({processingLength})</BoxText>
             <FontAwesomeIcon icon={faSortDown} className="icon" />
           </ProcessingSelect>
-          <MaterialSelect>
-            <BoxText>재료</BoxText>
+          <MaterialSelect
+            onClick={() => {
+              menuToggle(2);
+            }}
+          >
+            <BoxText>재료({materialLength})</BoxText>
             <FontAwesomeIcon icon={faSortDown} className="icon" />
           </MaterialSelect>
           {plus[0] && (
             <ProcessingPlus>
-              {['밀링', '선박'].map((item: any) => {
+              {['밀링', '선반'].map((item: any, idx: any) => {
                 return (
                   <Checkbox key={item.toString()}>
-                    <Input type="checkbox" />
+                    <Input
+                      id={idx}
+                      type="checkbox"
+                      onChange={(e) => {
+                        changeHandler(e.target.checked, item);
+                      }}
+                      checked={processing.includes(item)}
+                      value={item}
+                    />
                     <CheckText>{item}</CheckText>
                   </Checkbox>
                 );
@@ -47,12 +122,20 @@ const Main = () => {
             </ProcessingPlus>
           )}
           {plus[1] && (
-            <MaterialPlus>
+            <MaterialPlus id="2">
               {['알루미늄', '탄소강', '구리', '합금강', '강철'].map(
-                (item: any) => {
+                (item: any, idx: any) => {
                   return (
                     <Checkbox key={item.toString()}>
-                      <Input type="checkbox" />
+                      <Input
+                        id={idx}
+                        type="checkbox"
+                        onChange={(e) => {
+                          changeMaterial(e.target.checked, item);
+                        }}
+                        checked={material.includes(item)}
+                        value={item}
+                      />
                       <CheckText>{item}</CheckText>
                     </Checkbox>
                   );
@@ -61,8 +144,8 @@ const Main = () => {
             </MaterialPlus>
           )}
         </SelectBox>
-        <Boxlist>
-          {count?.map((item: any) => {
+        <BoxList>
+          {dataList?.map((item: any) => {
             return (
               <Item
                 title={item.title}
@@ -77,7 +160,7 @@ const Main = () => {
               />
             );
           })}
-        </Boxlist>
+        </BoxList>
       </Container>
     </>
   );
@@ -105,16 +188,17 @@ const CheckText = styled.div`
   line-height: 20px;
   margin-top: 2px;
 `;
+
 const MaterialPlus = styled.div`
   position: absolute;
   top: 35px;
   left: 110px;
+  z-index: 5;
+  width: 110px;
+  padding: 12px 7px;
   border: 1px solid #939fa5;
   border-radius: 4px;
-  width: 110px;
-  z-index: 5;
   background-color: white;
-  padding: 12px 7px;
 `;
 
 const Checkbox = styled.div`
@@ -122,15 +206,17 @@ const Checkbox = styled.div`
   align-content: center;
   padding: 2px 0;
 `;
+
 const Input = styled.input`
-  margin-right: 10px;
   width: 18px;
   height: 18px;
+  margin-right: 10px;
 `;
+
 const Title = styled.div`
+  color: #323d45;
   font-size: 20px;
   font-weight: 700;
-  color: #323d45;
   line-height: 32px;
 `;
 const Content = styled.div`
@@ -141,33 +227,34 @@ const Content = styled.div`
 `;
 const TextBox = styled.div`
   position: absolute;
-  width: 284px;
-  height: 56px;
   left: 155px;
   top: 110px;
+  width: 284px;
+  height: 56px;
 `;
 
 const SelectBox = styled.div`
+  display: flex;
   position: absolute;
   left: 155px;
   top: 198px;
-  display: flex;
 `;
 
 const ProcessingSelect = styled.div`
+  display: flex;
+  justify-content: space-between;
   width: 98px;
   height: 32px;
   margin-right: 10px;
   margin-bottom: 30px;
-  border-radius: 4px;
   padding: 4px 12px;
   border: 1px solid #939fa5;
-  display: flex;
-  justify-content: space-between;
+  border-radius: 4px;
 
   .icon {
     color: #939fa5;
   }
+
   :hover {
     border: 1px solid #2196f3;
     cursor: pointer;
@@ -178,28 +265,23 @@ const ProcessingSelect = styled.div`
   }
 `;
 const BoxText = styled.div`
+  display: flex;
+  align-items: center;
+  color: #323d45;
   font-style: normal;
   font-weight: 500;
   font-size: 12px;
   line-height: 14px;
-  /* identical to box height */
-
-  display: flex;
-  align-items: center;
-
-  /* Gray / 900 (default) */
-
-  color: #323d45;
 `;
 
 const MaterialSelect = styled.div`
+  display: flex;
+  justify-content: space-between;
   width: 76px;
   height: 32px;
   padding: 4px 12px;
-  border-radius: 4px;
   border: 1px solid #939fa5;
-  display: flex;
-  justify-content: space-between;
+  border-radius: 4px;
 
   .icon {
     color: #939fa5;
@@ -215,14 +297,14 @@ const MaterialSelect = styled.div`
   }
 `;
 
-const Boxlist = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  padding: 0px;
+const BoxList = styled.div`
   position: absolute;
   width: 1130.01px;
   height: 728px;
   left: 155px;
   top: 262px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  padding: 0px;
 `;
