@@ -5,6 +5,21 @@ import { faSortDown } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import Item from './item';
 
+interface Iprops {
+  requests: [
+    {
+      title: string;
+      client: string;
+      due: string;
+      count: number;
+      amount: number;
+      method: string[];
+      material: string[];
+      status: string;
+    },
+  ];
+}
+
 const Main = () => {
   const [dataList, setDataList] = useState<any>([]);
   const [plus, setPlus] = useState<any>([false, false]);
@@ -19,7 +34,7 @@ const Main = () => {
         method: 'GET',
       })
         .then((res) => res.json())
-        .then((data) => {
+        .then((data: Iprops) => {
           setDataList(data.requests);
         });
     } else {
@@ -145,21 +160,26 @@ const Main = () => {
           )}
         </SelectBox>
         <BoxList>
-          {dataList?.map((item: any) => {
-            return (
-              <Item
-                title={item.title}
-                key={item.id}
-                client={item.client}
-                due={item.due}
-                count={item.count}
-                amount={item.amount}
-                method={item.method}
-                material={item.material}
-                status={item.status}
-              />
-            );
-          })}
+          {dataList.length !== 0 ? (
+            dataList?.map((item: any) => {
+              return (
+                <Item
+                  title={item.title}
+                  key={item.id}
+                  client={item.client}
+                  due={item.due}
+                  count={item.count}
+                  amount={item.amount}
+                  method={item.method}
+                  material={item.material}
+                />
+              );
+            })
+          ) : (
+            <NotificationText>
+              <p>조건에 맞는 견적 요청이 없습니다.</p>
+            </NotificationText>
+          )}
         </BoxList>
       </Container>
     </>
@@ -306,5 +326,18 @@ const BoxList = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  padding: 0px;
+`;
+
+const NotificationText = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 1130px;
+  height: 100px;
+  border: 1px solid #c2c2c2;
+  border-radius: 4px;
+  color: #939fa5;
+  font-size: 14px;
+  text-align: center;
+  line-height: 20px;
 `;

@@ -18,6 +18,7 @@ const Navbar = () => {
     </>
   );
 };
+
 const Nav = styled.div`
   background: #1565c0;
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 2px 2px rgba(0, 0, 0, 0.24);
@@ -43,6 +44,7 @@ const UserInfo = styled.div`
   height: 20px;
   right: 40px;
   top: 25px;
+
   .icon {
     font-size: 13px;
     color: white;

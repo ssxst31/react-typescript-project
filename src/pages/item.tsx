@@ -1,7 +1,25 @@
 import { Reset } from 'styled-reset';
 import styled from 'styled-components';
 
-const Item = ({ title, client, due, count, amount, method, material }: any) => {
+interface Iprops {
+  title: string;
+  client: string;
+  due: string;
+  count: number;
+  amount: number;
+  method: string[];
+  material: string[];
+}
+
+const Item = ({
+  title,
+  client,
+  due,
+  count,
+  amount,
+  method,
+  material,
+}: Iprops) => {
   return (
     <>
       <Reset />
