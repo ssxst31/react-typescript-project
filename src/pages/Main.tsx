@@ -29,18 +29,14 @@ const Main = () => {
   const materialLength = material.length;
 
   useEffect(() => {
-    if (filterMenu(processing, material).length === 0) {
-      fetch('/data/requests.json', {
-        method: 'GET',
-      })
-        .then((res) => res.json())
-        .then((data: Iprops) => {
-          setDataList(data.requests);
-        });
-    } else {
-      setDataList(filterMenu(processing, material));
-    }
-  }, [processing, material]);
+    fetch('/data/requests.json', {
+      method: 'GET',
+    })
+      .then((res) => res.json())
+      .then((data: Iprops) => {
+        setDataList(data.requests);
+      });
+  }, []);
 
   const menuToggle = (e: number) => {
     if (e === 1) {
@@ -52,14 +48,16 @@ const Main = () => {
   };
 
   const filterMenu = (processing: any, material: any) => {
-    const filteredMonsters = dataList.filter(
+    let filteredDataList = dataList.filter(
       (item: any) =>
         (item.method.includes('선반') && processing.indexOf('선반') > -1) ||
         (item.method.includes('밀링') && processing.indexOf('밀링') > -1),
     );
-
+    if (filteredDataList.length === 0) {
+      filteredDataList = dataList;
+    }
     if (materialLength) {
-      const newFilteredMonsters = dataList.filter(
+      const newFilteredDataList = filteredDataList.filter(
         (item: any) =>
           (material.indexOf('알루미늄') > -1 &&
             item?.material.includes('알루미늄')) ||
@@ -70,9 +68,10 @@ const Main = () => {
           (material.indexOf('스테인리스강') > -1 &&
             item?.material.includes('스테인리스강')),
       );
-      return newFilteredMonsters;
+
+      return newFilteredDataList;
     }
-    return filteredMonsters;
+    return filteredDataList;
   };
 
   const changeHandler = (checked: any, item: any) => {
@@ -160,8 +159,8 @@ const Main = () => {
           )}
         </SelectBox>
         <BoxList>
-          {dataList.length !== 0 ? (
-            dataList?.map((item: any) => {
+          {filterMenu(processing, material).length > 0 ? (
+            filterMenu(processing, material)?.map((item: any) => {
               return (
                 <Item
                   title={item.title}
