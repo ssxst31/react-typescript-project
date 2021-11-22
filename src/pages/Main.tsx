@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Reset } from 'styled-reset';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSortDown } from '@fortawesome/free-solid-svg-icons';
+import { faSortDown, faRedo } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import Item from './item';
 import URL from '../config';
@@ -23,6 +23,11 @@ interface Iprops {
 
 interface Props {
   margin: any;
+}
+
+interface Color {
+  processingColor: any;
+  materialColor: any;
 }
 
 const Main = () => {
@@ -77,7 +82,6 @@ const Main = () => {
           (material.indexOf('스테인리스강') > -1 &&
             item?.material.includes('스테인리스강')),
       );
-
       return toggleIs
         ? newFilteredDataList?.filter((item: any) =>
             item.status.includes('상담중'),
@@ -104,7 +108,10 @@ const Main = () => {
       setMaterial(material.filter((el: any) => el !== item));
     }
   };
-
+  const filterReset = () => {
+    setMaterial('');
+    setProcessing('');
+  };
   return (
     <>
       <Reset />
@@ -115,21 +122,41 @@ const Main = () => {
         </TextBox>
         <SelectBox>
           <ProcessingSelect
+            materialColor={materialLength}
+            processingColor={processingLength}
             onClick={() => {
               menuToggle(1);
             }}
           >
-            <BoxText>가공방식 ({processingLength})</BoxText>
+            <ProcessingText
+              processingColor={processingLength}
+              materialColor={materialLength}
+            >
+              가공방식{processingLength > 0 && `(${processingLength})`}
+            </ProcessingText>
             <FontAwesomeIcon icon={faSortDown} className="icon" />
           </ProcessingSelect>
           <MaterialSelect
             onClick={() => {
               menuToggle(2);
             }}
+            materialColor={materialLength}
+            processingColor={processingLength}
           >
-            <BoxText>재료({materialLength})</BoxText>
+            <MaterialText
+              materialColor={materialLength}
+              processingColor={processingLength}
+            >
+              재료{materialLength > 0 && `(${materialLength})`}
+            </MaterialText>
             <FontAwesomeIcon icon={faSortDown} className="icon" />
           </MaterialSelect>
+          {materialLength + processingLength !== 0 && (
+            <FilteringResetBnt onClick={filterReset}>
+              <FontAwesomeIcon icon={faRedo} className="icon" />
+              <ResetText>필터링 리셋</ResetText>
+            </FilteringResetBnt>
+          )}
           {plus[0] && (
             <ProcessingPlus>
               {['밀링', '선반'].map((item: any, idx: any) => {
@@ -189,7 +216,7 @@ const Main = () => {
                   count={item.count}
                   amount={item.amount}
                   method={item.method}
-                  material={item.material}
+                  material={item.material.join(',')}
                   status={item.status}
                 />
               );
@@ -319,7 +346,7 @@ const ToggleText = styled.div`
   font-weight: 500;
 `;
 
-const ProcessingSelect = styled.div`
+const ProcessingSelect = styled.div<Color>`
   display: flex;
   justify-content: space-between;
   width: 98px;
@@ -329,9 +356,10 @@ const ProcessingSelect = styled.div`
   padding: 4px 12px;
   border: 1px solid #939fa5;
   border-radius: 4px;
+  background: ${(props) => (props.processingColor ? '#1565C0' : '#FFFFFF')};
 
   .icon {
-    color: #939fa5;
+    color: ${(props) => (props.processingColor ? '#FFFFFF' : '#939fa5')};
   }
 
   :hover {
@@ -344,7 +372,7 @@ const ProcessingSelect = styled.div`
   }
 `;
 
-const BoxText = styled.div`
+const ProcessingText = styled.div<Color>`
   display: flex;
   align-items: center;
   color: #323d45;
@@ -352,9 +380,21 @@ const BoxText = styled.div`
   font-weight: 500;
   font-size: 12px;
   line-height: 14px;
+  color: ${(props) => (props.processingColor ? '#FFFFFF' : 'black')};
 `;
 
-const MaterialSelect = styled.div`
+const MaterialText = styled.div<Color>`
+  display: flex;
+  align-items: center;
+  color: #323d45;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  color: ${(props) => (props.materialColor ? '#FFFFFF' : 'black')};
+`;
+
+const MaterialSelect = styled.div<Color>`
   display: flex;
   justify-content: space-between;
   width: 76px;
@@ -362,9 +402,9 @@ const MaterialSelect = styled.div`
   padding: 4px 12px;
   border: 1px solid #939fa5;
   border-radius: 4px;
-
+  background: ${(props) => (props.materialColor ? '#1565C0' : '#FFFFFF')};
   .icon {
-    color: #939fa5;
+    color: ${(props) => (props.materialColor ? '#FFFFFF' : '#939fa5')};
   }
 
   :hover {
@@ -375,6 +415,29 @@ const MaterialSelect = styled.div`
   :focus {
     outline: none;
   }
+`;
+
+const FilteringResetBnt = styled.div`
+  margin-left: 20px;
+  margin-top: 5px;
+  font-size: 12px;
+  line-height: 20px;
+  color: #2196f3;
+  display: flex;
+  height: 25px;
+
+  .icon {
+    color: #2196f3;
+    width: 16px;
+    height: 16px;
+  }
+  :hover {
+    cursor: pointer;
+  }
+`;
+
+const ResetText = styled.div`
+  margin-left: 12px;
 `;
 
 const BoxList = styled.div`
