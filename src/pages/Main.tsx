@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortDown } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import Item from './item';
+import URL from '../config';
 
 interface Iprops {
   requests: [
@@ -29,12 +30,12 @@ const Main = () => {
   const materialLength = material.length;
 
   useEffect(() => {
-    fetch('/data/requests.json', {
+    fetch(`${URL}`, {
       method: 'GET',
     })
       .then((res) => res.json())
       .then((data: Iprops) => {
-        setDataList(data.requests);
+        setDataList(data);
       });
   }, []);
 
@@ -48,12 +49,12 @@ const Main = () => {
   };
 
   const filterMenu = (processing: any, material: any) => {
-    let filteredDataList = dataList.filter(
+    let filteredDataList = dataList?.filter(
       (item: any) =>
         (item.method.includes('선반') && processing.indexOf('선반') > -1) ||
         (item.method.includes('밀링') && processing.indexOf('밀링') > -1),
     );
-    if (filteredDataList.length === 0) {
+    if (filteredDataList?.length === 0) {
       filteredDataList = dataList;
     }
     if (materialLength) {
@@ -159,7 +160,7 @@ const Main = () => {
           )}
         </SelectBox>
         <BoxList>
-          {filterMenu(processing, material).length > 0 ? (
+          {filterMenu(processing, material)?.length > 0 ? (
             filterMenu(processing, material)?.map((item: any) => {
               return (
                 <Item
