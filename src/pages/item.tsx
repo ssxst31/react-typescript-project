@@ -9,6 +9,7 @@ interface Iprops {
   amount: number;
   method: string[];
   material: string[];
+  status: string;
 }
 
 const Item = ({
@@ -19,12 +20,16 @@ const Item = ({
   amount,
   method,
   material,
+  status,
 }: Iprops) => {
   return (
     <>
       <Reset />
       <Container>
-        <Title>{title}</Title>
+        <Title>
+          {title}
+          {status === '상담중' && <ConsultingText>상담중</ConsultingText>}
+        </Title>
         <Client>{client}</Client>
         <Due>{due}까지 납기</Due>
         <TextBox>
@@ -67,7 +72,7 @@ const Container = styled.div`
   background: #ffffff;
   border: 1px solid #e5e5e5;
   border-radius: 4px;
-
+  margin-right: 10px;
   :hover {
     border: 2px solid #2196f3;
     cursor: pointer;
@@ -86,6 +91,23 @@ const Title = styled.div`
   font-size: 16px;
   line-height: 24px;
   color: #323d45;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const ConsultingText = styled.div`
+  left: 285px;
+  bottom: 20px;
+  border: 1px solid #ffa000;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 20px;
+  width: 50px;
+  height: 24px;
+  padding: 2px 8px;
+  color: #ffa000;
 `;
 
 const Client = styled.div`

@@ -21,11 +21,16 @@ interface Iprops {
   ];
 }
 
+interface Props {
+  margin: any;
+}
+
 const Main = () => {
   const [dataList, setDataList] = useState<any>([]);
   const [plus, setPlus] = useState<any>([false, false]);
   const [processing, setProcessing] = useState<any>([]);
   const [material, setMaterial] = useState<any>([]);
+  const [toggleIs, setToggleIs] = useState<any>(false);
   const processingLength = processing.length;
   const materialLength = material.length;
 
@@ -46,6 +51,9 @@ const Main = () => {
     if (e === 2) {
       setPlus([false, !plus[1]]);
     }
+  };
+  const qwe = () => {
+    setToggleIs(!toggleIs);
   };
 
   const filterMenu = (processing: any, material: any) => {
@@ -70,9 +78,15 @@ const Main = () => {
             item?.material.includes('스테인리스강')),
       );
 
-      return newFilteredDataList;
+      return toggleIs
+        ? newFilteredDataList?.filter((item: any) =>
+            item.status.includes('상담중'),
+          )
+        : newFilteredDataList;
     }
-    return filteredDataList;
+    return toggleIs
+      ? filteredDataList?.filter((item: any) => item.status.includes('상담중'))
+      : filteredDataList;
   };
 
   const changeHandler = (checked: any, item: any) => {
@@ -158,6 +172,10 @@ const Main = () => {
               )}
             </MaterialPlus>
           )}
+          <ToggleBnt margin={toggleIs}>
+            <Toggle onClick={qwe} margin={toggleIs} />
+          </ToggleBnt>
+          <ToggleText>상담 중인 요청만 보기</ToggleText>
         </SelectBox>
         <BoxList>
           {filterMenu(processing, material)?.length > 0 ? (
@@ -172,6 +190,7 @@ const Main = () => {
                   amount={item.amount}
                   method={item.method}
                   material={item.material}
+                  status={item.status}
                 />
               );
             })
@@ -239,12 +258,14 @@ const Title = styled.div`
   font-weight: 700;
   line-height: 32px;
 `;
+
 const Content = styled.div`
   margin-bottom: 30px;
   color: #323d45;
   font-size: 16px;
   line-height: 24px;
 `;
+
 const TextBox = styled.div`
   position: absolute;
   left: 155px;
@@ -258,6 +279,44 @@ const SelectBox = styled.div`
   position: absolute;
   left: 155px;
   top: 198px;
+  width: 1130px;
+`;
+
+const Toggle = styled.div<Props>`
+  background: ${(props) => (props.margin ? '#2196F3' : '#f5f5f5')};
+  width: 20px;
+  height: 20px;
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 2px 2px rgba(0, 0, 0, 0.24);
+  border-radius: 15px;
+  transform: translateY(-18%);
+  margin-left: ${(props) => props.margin && '18px'};
+  transition: 0.3s;
+`;
+
+const ToggleBnt = styled.div<Props>`
+  width: 34px;
+  height: 14px;
+  background: #c2c2c2;
+  background: ${(props) => (props.margin ? '#BBDEFB' : '#c2c2c2')};
+  border-radius: 15px;
+  position: absolute;
+  right: 140px;
+  margin-top: 10px;
+  transition: 0.3s;
+
+  :hover {
+    cursor: pointer;
+  }
+`;
+
+const ToggleText = styled.div`
+  position: absolute;
+  right: 0px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #323d45;
+  margin-top: 8px;
+  font-weight: 500;
 `;
 
 const ProcessingSelect = styled.div`
@@ -284,6 +343,7 @@ const ProcessingSelect = styled.div`
     outline: none;
   }
 `;
+
 const BoxText = styled.div`
   display: flex;
   align-items: center;
@@ -326,6 +386,7 @@ const BoxList = styled.div`
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
+  align-content: space-between;
 `;
 
 const NotificationText = styled.div`
