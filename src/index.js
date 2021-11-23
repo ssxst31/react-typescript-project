@@ -2,8 +2,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import GlobalStyles from './styles/GlobalStyles';
-import Main from './pages/Main';
-import Navbar from './pages/Navbar';
+import Main from './pages/Main/Main';
+import Navbar from './components/Navbar';
 
 ReactDOM.render(
   <React.StrictMode>

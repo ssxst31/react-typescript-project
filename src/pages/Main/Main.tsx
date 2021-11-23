@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSortDown, faRedo } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import Item from './item';
-import URL from '../config';
+import URL from '../../config';
 
 interface Iprops {
   requests: [
@@ -22,23 +22,25 @@ interface Iprops {
 }
 
 interface Props {
-  margin: any;
+  margin: boolean;
 }
 
 interface Color {
-  processingColor: any;
-  materialColor: any;
+  methodColor: number;
+  materialColor: number;
 }
 
 const Main = () => {
   const [dataList, setDataList] = useState<any>([]);
   const [plus, setPlus] = useState<any>([false, false]);
-  const [processing, setProcessing] = useState<any>([]);
+  const [method, setMethod] = useState<any>([]);
   const [material, setMaterial] = useState<any>([]);
   const [toggleIs, setToggleIs] = useState<any>(false);
-  const processingLength = processing.length;
-  const materialLength = material.length;
 
+  const methodLength = method.length;
+  const materialLength = material.length;
+  const materialList = ['알루미늄', '탄소강', '구리', '합금강', '강철'];
+  const methodList = ['밀링', '선반'];
   useEffect(() => {
     fetch(`${URL}`, {
       method: 'GET',
@@ -53,19 +55,21 @@ const Main = () => {
     if (e === 1) {
       setPlus([!plus[0], false]);
     }
+
     if (e === 2) {
       setPlus([false, !plus[1]]);
     }
   };
-  const qwe = () => {
+
+  const toggleHandle = () => {
     setToggleIs(!toggleIs);
   };
 
-  const filterMenu = (processing: any, material: any) => {
+  const filterMenu = (method: any, material: any) => {
     let filteredDataList = dataList?.filter(
       (item: any) =>
-        (item.method.includes('선반') && processing.indexOf('선반') > -1) ||
-        (item.method.includes('밀링') && processing.indexOf('밀링') > -1),
+        (item.method.includes('선반') && method.indexOf('선반') > -1) ||
+        (item.method.includes('밀링') && method.indexOf('밀링') > -1),
     );
     if (filteredDataList?.length === 0) {
       filteredDataList = dataList;
@@ -93,25 +97,27 @@ const Main = () => {
       : filteredDataList;
   };
 
-  const changeHandler = (checked: any, item: any) => {
+  const changeMethod = (checked: boolean, item: string) => {
     if (checked) {
-      setProcessing([...processing, item]);
+      setMethod([...method, item]);
     } else {
-      setProcessing(processing.filter((el: any) => el !== item));
+      setMethod(method.filter((el: string) => el !== item));
     }
   };
 
-  const changeMaterial = (checked: any, item: any) => {
+  const changeMaterial = (checked: boolean, item: string) => {
     if (checked) {
       setMaterial([...material, item]);
     } else {
-      setMaterial(material.filter((el: any) => el !== item));
+      setMaterial(material.filter((el: string) => el !== item));
     }
   };
+
   const filterReset = () => {
     setMaterial('');
-    setProcessing('');
+    setMethod('');
   };
+
   return (
     <>
       <Reset />
@@ -121,92 +127,88 @@ const Main = () => {
           <Content>파트너님에게 딱 알맞는 요청서를 찾아보세요.</Content>
         </TextBox>
         <SelectBox>
-          <ProcessingSelect
+          <MethodSelect
             materialColor={materialLength}
-            processingColor={processingLength}
+            methodColor={methodLength}
             onClick={() => {
               menuToggle(1);
             }}
           >
-            <ProcessingText
-              processingColor={processingLength}
+            <MethodText
+              methodColor={methodLength}
               materialColor={materialLength}
             >
-              가공방식{processingLength > 0 && `(${processingLength})`}
-            </ProcessingText>
+              가공방식{methodLength > 0 && `(${methodLength})`}
+            </MethodText>
             <FontAwesomeIcon icon={faSortDown} className="icon" />
-          </ProcessingSelect>
+          </MethodSelect>
           <MaterialSelect
             onClick={() => {
               menuToggle(2);
             }}
             materialColor={materialLength}
-            processingColor={processingLength}
+            methodColor={methodLength}
           >
             <MaterialText
               materialColor={materialLength}
-              processingColor={processingLength}
+              methodColor={methodLength}
             >
               재료{materialLength > 0 && `(${materialLength})`}
             </MaterialText>
             <FontAwesomeIcon icon={faSortDown} className="icon" />
           </MaterialSelect>
-          {materialLength + processingLength !== 0 && (
+          {materialLength + methodLength !== 0 && (
             <FilteringResetBnt onClick={filterReset}>
               <FontAwesomeIcon icon={faRedo} className="icon" />
               <ResetText>필터링 리셋</ResetText>
             </FilteringResetBnt>
           )}
           {plus[0] && (
-            <ProcessingPlus>
-              {['밀링', '선반'].map((item: any, idx: any) => {
+            <MethodPlus>
+              {methodList.map((item: string) => {
                 return (
                   <Checkbox key={item.toString()}>
                     <Input
-                      id={idx}
                       type="checkbox"
                       onChange={(e) => {
-                        changeHandler(e.target.checked, item);
+                        changeMethod(e.target.checked, item);
                       }}
-                      checked={processing.includes(item)}
+                      checked={method.includes(item)}
                       value={item}
                     />
                     <CheckText>{item}</CheckText>
                   </Checkbox>
                 );
               })}
-            </ProcessingPlus>
+            </MethodPlus>
           )}
           {plus[1] && (
-            <MaterialPlus id="2">
-              {['알루미늄', '탄소강', '구리', '합금강', '강철'].map(
-                (item: any, idx: any) => {
-                  return (
-                    <Checkbox key={item.toString()}>
-                      <Input
-                        id={idx}
-                        type="checkbox"
-                        onChange={(e) => {
-                          changeMaterial(e.target.checked, item);
-                        }}
-                        checked={material.includes(item)}
-                        value={item}
-                      />
-                      <CheckText>{item}</CheckText>
-                    </Checkbox>
-                  );
-                },
-              )}
+            <MaterialPlus>
+              {materialList.map((item: string) => {
+                return (
+                  <Checkbox key={item.toString()}>
+                    <Input
+                      type="checkbox"
+                      onChange={(e) => {
+                        changeMaterial(e.target.checked, item);
+                      }}
+                      checked={material.includes(item)}
+                      value={item}
+                    />
+                    <CheckText>{item}</CheckText>
+                  </Checkbox>
+                );
+              })}
             </MaterialPlus>
           )}
           <ToggleBnt margin={toggleIs}>
-            <Toggle onClick={qwe} margin={toggleIs} />
+            <Toggle onClick={toggleHandle} margin={toggleIs} />
           </ToggleBnt>
           <ToggleText>상담 중인 요청만 보기</ToggleText>
         </SelectBox>
         <BoxList>
-          {filterMenu(processing, material)?.length > 0 ? (
-            filterMenu(processing, material)?.map((item: any) => {
+          {filterMenu(method, material)?.length > 0 ? (
+            filterMenu(method, material)?.map((item: any) => {
               return (
                 <Item
                   title={item.title}
@@ -238,33 +240,33 @@ const Container = styled.div`
   margin: 50px 100px;
 `;
 
-const ProcessingPlus = styled.div`
+const MethodPlus = styled.div`
   position: absolute;
   top: 35px;
+  width: 110px;
+  padding: 12px 7px;
   border: 1px solid #939fa5;
   border-radius: 4px;
-  width: 110px;
   z-index: 5;
   background-color: white;
-  padding: 12px 7px;
 `;
 
 const CheckText = styled.div`
+  margin-top: 2px;
   font-size: 14px;
   line-height: 20px;
-  margin-top: 2px;
 `;
 
 const MaterialPlus = styled.div`
   position: absolute;
   top: 35px;
   left: 110px;
-  z-index: 5;
   width: 110px;
   padding: 12px 7px;
   border: 1px solid #939fa5;
   border-radius: 4px;
   background-color: white;
+  z-index: 5;
 `;
 
 const Checkbox = styled.div`
@@ -346,7 +348,7 @@ const ToggleText = styled.div`
   font-weight: 500;
 `;
 
-const ProcessingSelect = styled.div<Color>`
+const MethodSelect = styled.div<Color>`
   display: flex;
   justify-content: space-between;
   width: 98px;
@@ -356,10 +358,10 @@ const ProcessingSelect = styled.div<Color>`
   padding: 4px 12px;
   border: 1px solid #939fa5;
   border-radius: 4px;
-  background: ${(props) => (props.processingColor ? '#1565C0' : '#FFFFFF')};
+  background: ${(props) => (props.methodColor ? '#1565C0' : '#FFFFFF')};
 
   .icon {
-    color: ${(props) => (props.processingColor ? '#FFFFFF' : '#939fa5')};
+    color: ${(props) => (props.methodColor ? '#FFFFFF' : '#939fa5')};
   }
 
   :hover {
@@ -372,7 +374,7 @@ const ProcessingSelect = styled.div<Color>`
   }
 `;
 
-const ProcessingText = styled.div<Color>`
+const MethodText = styled.div<Color>`
   display: flex;
   align-items: center;
   color: #323d45;
@@ -380,7 +382,7 @@ const ProcessingText = styled.div<Color>`
   font-weight: 500;
   font-size: 12px;
   line-height: 14px;
-  color: ${(props) => (props.processingColor ? '#FFFFFF' : 'black')};
+  color: ${(props) => (props.methodColor ? '#FFFFFF' : 'black')};
 `;
 
 const MaterialText = styled.div<Color>`

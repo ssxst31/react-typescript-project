@@ -20,12 +20,12 @@ const Navbar = () => {
 };
 
 const Nav = styled.div`
+  display: flex;
+  justify-content: space-between;
+  height: 70px;
+  padding: 25px 40px;
   background: #1565c0;
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 2px 2px rgba(0, 0, 0, 0.24);
-  height: 70px;
-  display: flex;
-  padding: 25px 40px;
-  justify-content: space-between;
 `;
 
 const Title = styled.div`
@@ -35,41 +35,39 @@ const Title = styled.div`
 `;
 
 const UserInfo = styled.div`
+  position: absolute;
+  right: 40px;
+  top: 25px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 0px;
-  position: absolute;
   width: 208.67px;
   height: 20px;
-  right: 40px;
-  top: 25px;
 
   .icon {
-    font-size: 13px;
-    color: white;
     margin-right: 5px;
     margin-bottom: 3px;
+    font-size: 13px;
+    color: white;
   }
 `;
 
 const Name = styled.div`
-  font-family: Noto Sans KR Medium;
+  display: flex;
+  align-items: center;
   font-style: normal;
   font-weight: 500;
   font-size: 14px;
-  line-height: 20px;
-  display: flex;
-  align-items: center;
   color: #ffffff;
+  line-height: 20px;
 `;
 
 const LogoutBnt = styled.div`
-  font-size: 14px;
-  color: white;
   margin-left: 35px;
   padding-left: 35px;
   border-left: #ffffff 2px solid;
+  font-size: 14px;
+  color: white;
 `;
 
 export default Navbar;
