@@ -41,6 +41,7 @@ const Main = () => {
   const materialLength = material.length;
   const materialList = ['알루미늄', '탄소강', '구리', '합금강', '강철'];
   const methodList = ['밀링', '선반'];
+
   useEffect(() => {
     fetch(`${URL}`, {
       method: 'GET',
